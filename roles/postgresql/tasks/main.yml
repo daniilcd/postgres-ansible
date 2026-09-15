@@ -1,0 +1,65 @@
+---
+- name: Disable CD-ROM repository
+  ansible.builtin.lineinfile:
+    path: /etc/apt/sources.list
+    regexp: '^deb .*file:///cdrom.*$'
+    state: absent
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - ca-certificates
+      - postgresql-common
+    state: present
+    update_cache: true
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - ca-certificates
+      - postgresql-common
+    state: present
+    update_cache: true
+
+- name: Create PGDG directory
+  ansible.builtin.file:
+    path: /usr/share/postgresql-common/pgdg
+    state: directory
+    mode: "0755"
+
+- name: Download PGDG public key
+  ansible.builtin.get_url:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    dest: /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+    mode: "0644"
+
+- name: Convert PGDG key to GPG format
+  ansible.builtin.command:
+    cmd: >
+      gpg --dearmor
+      -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+      /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+  args:
+    creates: /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+
+- name: Add PGDG repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/pgdg.sources
+    mode: "0644"
+    content: |
+      Types: deb
+      URIs: https://apt.postgresql.org/pub/repos/apt
+      Suites: {{ ansible_distribution_release }}-pgdg
+      Components: main
+      Signed-By: /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install PostgreSQL 18
+  ansible.builtin.apt:
+    name: postgresql-18
+    state: present
