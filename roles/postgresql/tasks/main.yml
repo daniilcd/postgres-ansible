@@ -11,15 +11,8 @@
       - curl
       - ca-certificates
       - postgresql-common
-    state: present
-    update_cache: true
-
-- name: Install required packages
-  ansible.builtin.apt:
-    name:
-      - curl
-      - ca-certificates
-      - postgresql-common
+      - python3-psycopg2
+      - acl
     state: present
     update_cache: true
 
@@ -63,3 +56,42 @@
   ansible.builtin.apt:
     name: postgresql-18
     state: present
+
+- name: Deploy PostgreSQL production configuration
+  ansible.builtin.template:
+    src: production.conf.j2
+    dest: /etc/postgresql/18/main/conf.d/production.conf
+    owner: postgres
+    group: postgres
+    mode: "0644"
+  notify: Restart PostgreSQL
+
+- name: Deploy PostgreSQL pg_hba configuration
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: /etc/postgresql/18/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: "0640"
+  notify: Reload PostgreSQL
+
+- name: Create PostgreSQL application user
+  community.postgresql.postgresql_user:
+    name: "{{ postgresql_app_user }}"
+    password: "{{ postgresql_app_password }}"
+    role_attr_flags: LOGIN
+    state: present
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_user: postgres
+  no_log: true
+
+- name: Create PostgreSQL application database
+  community.postgresql.postgresql_db:
+    name: "{{ postgresql_app_db }}"
+    owner: "{{ postgresql_app_user }}"
+    encoding: UTF8
+    state: present
+    login_unix_socket: /var/run/postgresql
+  become: true
+  become_user: postgres

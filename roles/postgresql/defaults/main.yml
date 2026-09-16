@@ -1,0 +1,25 @@
+---
+postgresql_version: "18"
+
+postgresql_shared_buffers: "512MB"
+postgresql_effective_cache_size: "1536MB"
+postgresql_work_mem: "8MB"
+postgresql_maintenance_work_mem: "128MB"
+
+postgresql_max_connections: 50
+
+postgresql_max_wal_size: "2GB"
+postgresql_checkpoint_timeout: "15min"
+postgresql_wal_level: "replica"
+
+postgresql_autovacuum_max_workers: 2
+
+postgresql_log_connections: "on"
+postgresql_log_disconnections: "on"
+postgresql_log_min_duration_statement: 1000
+
+postgresql_allowed_network: "192.168.12.0/24"
+postgresql_listen_addresses: "*"
+
+postgresql_app_user: "app_user"
+postgresql_app_db: "app_db"

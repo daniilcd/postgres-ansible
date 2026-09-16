@@ -1,0 +1,25 @@
+# Managed by Ansible
+
+# Memory
+shared_buffers = '{{ postgresql_shared_buffers }}'
+effective_cache_size = '{{ postgresql_effective_cache_size }}'
+work_mem = '{{ postgresql_work_mem }}'
+maintenance_work_mem = '{{ postgresql_maintenance_work_mem }}'
+
+# Connections
+max_connections = {{ postgresql_max_connections }}
+
+# WAL / Checkpoints
+wal_level = '{{ postgresql_wal_level }}'
+max_wal_size = '{{ postgresql_max_wal_size }}'
+checkpoint_timeout = '{{ postgresql_checkpoint_timeout }}'
+
+# Autovacuum
+autovacuum = on
+autovacuum_max_workers = {{ postgresql_autovacuum_max_workers }}
+
+# Logging
+log_connections = {{ postgresql_log_connections }}
+log_disconnections = {{ postgresql_log_disconnections }}
+log_min_duration_statement = {{ postgresql_log_min_duration_statement }}
+listen_addresses = '{{ postgresql_listen_addresses }}'
